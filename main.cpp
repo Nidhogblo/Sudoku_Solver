@@ -26,7 +26,7 @@ void ocultarConsola(){
 
 LRESULT CALLBACK ProcediementoVentana(HWND hwnd,UINT msg, WPARAM wParam,LPARAM lParam);
 int WINAPI WinMain(HINSTANCE hIns,HINSTANCE hInstanciaPrevia,LPSTR lpCmdLinea,int nCmdShow){
-    //ocultarConsola();
+    ocultarConsola();
     HWND ventana;
     MSG mensaje;
     WNDCLASSEX clase;
