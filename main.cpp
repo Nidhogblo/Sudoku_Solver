@@ -140,7 +140,7 @@ LRESULT CALLBACK ProcediementoVentana(HWND hwnd,UINT msg, WPARAM wParam,LPARAM l
                                 coordenadasY+=40;
                                 coordenadasX-=360;
                                 for (int k = 0; k < 9; k++){
-                                    itoa(sudoku.Matrix[i][k],text,10); 
+                                    itoa(sudoku.matrix[i][k],text,10); 
                                     CreateWindowA("Static",text,ES_CENTER|WS_CHILD|WS_VISIBLE, coordenadasX,coordenadasY,20,20,hwnd,NULL,NULL,NULL);
                                     coordenadasX+=40;
                                 }   
