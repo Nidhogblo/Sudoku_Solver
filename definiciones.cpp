@@ -1,6 +1,7 @@
 #define ID_BTN_SALIR 10
 #define ID_BTN_RESOLVER 11
 #define ID_BTN_CREDITOS 12
+#define ID_BTN_DATABASE 13
 #define ID_LABEL 100
 #define ID_CELDA1X1 101
 #define ID_CELDA1X2 102

@@ -11,10 +11,11 @@ Jueves 27 de Enero del 2022
 
 #include <windows.h>
 #include <string.h>
-#include "Definiciones.cpp"
 #include <stdio.h>
 #include <tchar.h>
+#include <ctime>
 #include "Sudoku.h"
+#include "Definiciones.cpp"
 
 
 void ocultarConsola(){
@@ -24,66 +25,85 @@ void ocultarConsola(){
      ShowWindow(console,0);
 }
 
-LRESULT CALLBACK ProcediementoVentana(HWND hwnd,UINT msg, WPARAM wParam,LPARAM lParam);
+//Declare windows procedure
+LRESULT CALLBACK ProcedimientoVentana(HWND hwnd,UINT msg, WPARAM wParam,LPARAM lParam);
+
 int WINAPI WinMain(HINSTANCE hIns,HINSTANCE hInstanciaPrevia,LPSTR lpCmdLinea,int nCmdShow){
     ocultarConsola();
-    HWND ventana;
-    MSG mensaje;
-    WNDCLASSEX clase;
+    HWND ventana; //The handle for our window
+    MSG mensaje; //Here the messages to the applications are saved
+    WNDCLASSEX clase; //Data structure for the windowclass
+
+    //The window structure
     clase.cbSize = sizeof(WNDCLASSEX);
     clase.cbClsExtra = 0;
     clase.style = CS_HREDRAW | CS_VREDRAW;
-    clase.lpfnWndProc = ProcediementoVentana;
+    clase.lpfnWndProc = ProcedimientoVentana; //This function is called by windows
     clase.hInstance = hIns;
+    clase.lpszClassName = _T("INICIO");
+
+    //To use default icon and mouse pointer
     clase.hIcon = LoadIcon(NULL,0);
     clase.hIconSm =LoadIcon(NULL,IDI_INFORMATION);
     clase.hCursor = LoadCursor(NULL,IDC_ARROW);
-    clase.lpszClassName = _T("INICIO");
+
+    //Registrer the window class. If it fails quit the program
     if(!RegisterClassEx(&clase)){
         MessageBox( NULL,_T("No se pudo ejecutar la aplicacion"),_T("Error"),MB_ICONERROR);
         return EXIT_FAILURE;
     }
 
-    ventana = CreateWindowEx(0,_T("Inicio"),_T("Sudoku Resolver"),WS_OVERLAPPEDWINDOW |WS_SYSMENU,
-                            400,80,580,630,HWND_DESKTOP,NULL,hIns,NULL);
+    ventana = CreateWindowEx(
+        0, //Extended posibilities for variation
+        _T("Inicio"), //Class name
+        _T("Sudoku Resolver"), //Title text
+        WS_SYSMENU, //Default window
+        400,80, //Position of the window
+        580, //Window width
+        630, //Window height
+        HWND_DESKTOP, //The window is a child window to Desktop
+        NULL, //No menu
+        hIns, //Program Instance handler
+        NULL); //No window creation data
 
-
-
-    CreateWindowEx(0,_T("BUTTON"),_T("Exit"),BS_CENTER|WS_VISIBLE|WS_CHILD,400,500,150,30,ventana,(HMENU)10,NULL,NULL);
-    CreateWindowEx(0,_T("BUTTON"),_T("Solve"),BS_CENTER|WS_VISIBLE|WS_CHILD,18,500,150,30,ventana,(HMENU)11,hIns,NULL);
-    CreateWindowEx(0,_T("BUTTON"),_T("Credits"),BS_CENTER|WS_VISIBLE|WS_CHILD,209,450,150,30,ventana,(HMENU)12,hIns,NULL);
-
-
+    //Make the window visible on the screen
     ShowWindow(ventana,nCmdShow);
-    UpdateWindow(ventana);
 
+    //Run the message loop. It will run until GetMessage returns 0
     while(GetMessage(&mensaje,NULL,0,0)>0){
+            //Translate virtual-key messages into character messages
             TranslateMessage(&mensaje);
+            //Send message to WindowProcedure
             DispatchMessage(&mensaje);
     }
-    return 0;
+    //The program return value is 0, the value that PostQuitMessage gave
+    return mensaje.wParam;
 }
 
-LRESULT CALLBACK ProcediementoVentana(HWND hwnd,UINT msg, WPARAM wParam,LPARAM lParam){
+LRESULT CALLBACK ProcedimientoVentana(HWND hwnd,UINT msg, WPARAM wParam,LPARAM lParam){
     switch(msg){
                 case WM_CREATE:{
+                    CreateWindowEx(0,_T("BUTTON"),_T("Exit"),BS_CENTER|WS_VISIBLE|WS_CHILD,400,500,150,30,hwnd,(HMENU)10,NULL,NULL);
+                    CreateWindowEx(0,_T("BUTTON"),_T("Solve"),BS_CENTER|WS_VISIBLE|WS_CHILD,18,500,150,30,hwnd,(HMENU)11,NULL,NULL);
+                    CreateWindowEx(0,_T("BUTTON"),_T("Credits"),BS_CENTER|WS_VISIBLE|WS_CHILD,209,450,150,30,hwnd,(HMENU)12,NULL,NULL);
+                    CreateWindowEx(0,_T("BUTTON"),_T("DataBase"),BS_CENTER|WS_VISIBLE|WS_CHILD,209,520,150,30,hwnd,(HMENU)13,NULL,NULL);                    
                     long long iIdCelda = 10;
                     int coordenadasX = 490;
                     int coordenadasY = 30;
-                    char hola[2];
+                    char columnRowNumber[2];
                     
                     for (int i = 1; i < 10; i++){
-                        itoa(i,hola,10);
+                        itoa(i,columnRowNumber,10);
                         iIdCelda+=91;
                         coordenadasY+=40;
                         coordenadasX-=360;
         
-                        CreateWindowA("Static",hola,ES_CENTER|WS_CHILD|WS_VISIBLE, coordenadasX-55,coordenadasY,10,20,hwnd,NULL,NULL,NULL);
+                        CreateWindowA("Static",columnRowNumber,ES_CENTER|WS_CHILD|WS_VISIBLE, coordenadasX-55,coordenadasY,10,20,hwnd,NULL,NULL,NULL);
                         for (int k = 1; k < 10; k++){
                             if (i==1){
-                                itoa(k,hola,10);
+                                itoa(k,columnRowNumber,10);
                                 
-                                CreateWindowA("Static",hola,ES_CENTER|WS_CHILD|WS_VISIBLE, coordenadasX,coordenadasY-55,20,15,hwnd,NULL,NULL,NULL);
+                                CreateWindowA("Static",columnRowNumber,ES_CENTER|WS_CHILD|WS_VISIBLE, coordenadasX,coordenadasY-55,20,15,hwnd,NULL,NULL,NULL);
                             }
                             HMENU idCelda = (HMENU)iIdCelda;
                             CreateWindowEx(0,_T("EDIT"),_T(""),ES_NUMBER|ES_AUTOHSCROLL|ES_LEFT|WS_CHILD|WS_VISIBLE,coordenadasX,coordenadasY,20,20,hwnd,idCelda,NULL,NULL);
@@ -110,10 +130,6 @@ LRESULT CALLBACK ProcediementoVentana(HWND hwnd,UINT msg, WPARAM wParam,LPARAM l
                                         matrizCeldas[i][k] = 0;  
                                     }                                  
                                 }
-                            
-
-
-
 
                             int iIdCelda = 10;
                             
@@ -127,16 +143,18 @@ LRESULT CALLBACK ProcediementoVentana(HWND hwnd,UINT msg, WPARAM wParam,LPARAM l
                                     if (valorCelda < 10 && valorCelda > 0){
                                         matrizCeldas[i][k] = valorCelda;  
                                     }
+                                    else{
+                                        matrizCeldas[i][k] = 0;
+                                    }
                                     iIdCelda++;
                                 }
                             }
 
-                            //Aquí sigue la lógica del programa
                             Sudoku sudoku(matrizCeldas);
                             int coordenadasX = 490;
-                            int coordenadasY = 30;
-                            char text[2];            
+                            int coordenadasY = 30;           
                             for (int i = 0; i < 9; i++){
+                                char text[2]; 
                                 coordenadasY+=40;
                                 coordenadasX-=360;
                                 for (int k = 0; k < 9; k++){
@@ -146,13 +164,43 @@ LRESULT CALLBACK ProcediementoVentana(HWND hwnd,UINT msg, WPARAM wParam,LPARAM l
                                 }   
                             }
                             
+                            //Send data to database in Oracle
+                            string url = "https://apex.oracle.com/pls/apex/sudokusolver/sudoku/update?vfila";
+                            for (int i = 0; i < 9; i++)
+                            {  
+                                char text[2];
+                                itoa(i+1,text,10);
+                                url+=text;
+                                url+="=";
+                                for (int k = 0; k < 9; k++)
+                                {
+                                    char text[2];
+                                    itoa(sudoku.matrix[i][k],text,10);
+                                    url+=text;
+                                }
+                                if (i<8)
+                                {
+                                    url+="^&";
+                                    url+="vfila";
+                                }    
+                            }
+                            string command = "start iexplore "+url;
+                            char commandChar[100];
+                            strcpy(commandChar,command.c_str());                           
+                            system(commandChar);
+                            Sleep(5000);
+                            system("taskkill /IM iexplore.exe /F");  
                             break;
                         }
                         case ID_BTN_CREDITOS:{
                             UINT a;
                             MessageBoxA(hwnd,"Contributors:\nEmmanuel Humberto Solorzano Cabrera\nPablo Gutierrez Costales","Creators",a);
                             break;
-
+                        }
+                        case ID_BTN_DATABASE:{
+                            char command[] = "start chrome https://apex.oracle.com/pls/apex/r/sudokusolver/sudoku-solver";
+                            system(command);  
+                            break;
                         }
 
                     }
@@ -162,23 +210,6 @@ LRESULT CALLBACK ProcediementoVentana(HWND hwnd,UINT msg, WPARAM wParam,LPARAM l
                 case WM_DESTROY:{
                     PostQuitMessage(0);
                     break;
-                }
-
-                case WM_CTLCOLORSTATIC:{
-                    HDC hdcStatic = (HDC) wParam;
-                    break;
-                }
-
-                case WM_PAINT:
-                {
-                    PAINTSTRUCT ps;
-                    HDC hdc = BeginPaint(hwnd, &ps);
-
-
-
-                    FillRect(hdc, &ps.rcPaint, (HBRUSH) (COLOR_WINDOW+2));
-
-                    EndPaint(hwnd, &ps);
                 }
 
                 default:{
